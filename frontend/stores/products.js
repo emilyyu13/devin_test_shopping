@@ -47,26 +47,15 @@ export const useProductStore = defineStore('products', {
   },
   
   actions: {
-    async fetchProducts() {
+    fetchProducts() {
       this.loading = true;
       this.error = null;
       
-      try {
-        const runtimeConfig = useRuntimeConfig();
-        const response = await fetch(`${runtimeConfig.public.apiBaseUrl}/products`);
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch products');
-        }
-        
-        const data = await response.json();
-        this.products = data;
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        this.error = error.message;
-      } finally {
+      // In a real app, this would be an API call
+      setTimeout(() => {
+        // Products are already loaded in state
         this.loading = false;
-      }
+      }, 500);
     },
     
     updateStock(productId, quantity) {
