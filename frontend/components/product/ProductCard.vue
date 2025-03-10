@@ -1,39 +1,73 @@
 <template>
   <div class="bg-white rounded-lg shadow-md overflow-hidden">
-    <div class="h-48 bg-gray-200 relative">
-      <img :src="product.image" alt="Product image" class="w-full h-full object-cover">
-      <div v-if="product.stock <= 5 && product.stock > 0" class="absolute top-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded">Low Stock</div>
-      <div v-if="product.stock === 0" class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">Out of Stock</div>
-    </div>
+    <img :src="product.image" :alt="product.name" class="w-full h-48 object-cover">
+    
     <div class="p-4">
-      <h3 class="font-semibold text-lg mb-2">{{ product.name }}</h3>
-      <p class="text-gray-600 text-sm mb-4">{{ product.description }}</p>
-      <div class="flex justify-between items-center">
-        <span class="font-bold text-lg">${{ product.price.toFixed(2) }}</span>
-        <button 
-          @click="addToCart"
-          class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition duration-300"
-          :disabled="product.stock === 0"
-          :class="{ 'opacity-50 cursor-not-allowed': product.stock === 0 }"
-        >
-          Add to Cart
-        </button>
+      <h3 class="text-lg font-semibold mb-2">{{ product.name }}</h3>
+      <p class="text-gray-700 mb-4 h-12 overflow-hidden">{{ product.description }}</p>
+      
+      <div class="flex justify-between items-center mb-4">
+        <span class="text-xl font-bold">${{ product.price.toFixed(2) }}</span>
+        
+        <div class="flex items-center">
+          <span 
+            :class="{
+              'text-green-600': product.stock > 5,
+              'text-yellow-600': product.stock > 0 && product.stock <= 5,
+              'text-red-600': product.stock === 0
+            }"
+            class="text-sm mr-2"
+          >
+            {{ stockStatus }}
+          </span>
+          <div 
+            :class="{
+              'bg-green-500': product.stock > 5,
+              'bg-yellow-500': product.stock > 0 && product.stock <= 5,
+              'bg-red-500': product.stock === 0
+            }"
+            class="w-3 h-3 rounded-full"
+          ></div>
+        </div>
       </div>
+      
+      <button 
+        @click="addToCart" 
+        class="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300"
+        :disabled="product.stock === 0"
+        :class="{ 'opacity-50 cursor-not-allowed': product.stock === 0 }"
+      >
+        {{ product.stock === 0 ? 'Out of Stock' : 'Add to Cart' }}
+      </button>
     </div>
   </div>
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue';
+import { useCartStore } from '~/stores/cart';
+
+const props = defineProps({
   product: {
     type: Object,
     required: true
   }
 });
 
-const emit = defineEmits(['add-to-cart']);
+const cartStore = useCartStore();
+
+const stockStatus = computed(() => {
+  if (props.product.stock === 0) return 'Out of Stock';
+  if (props.product.stock <= 5) return `Low Stock: ${props.product.stock}`;
+  return `In Stock: ${props.product.stock}`;
+});
 
 const addToCart = () => {
-  emit('add-to-cart', props.product);
+  if (props.product.stock > 0) {
+    const success = cartStore.addToCart(props.product, 1);
+    if (success) {
+      // Show success notification or feedback
+    }
+  }
 };
 </script>

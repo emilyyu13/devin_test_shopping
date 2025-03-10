@@ -1,14 +1,14 @@
 # E-Commerce Order System
 
-A full-stack e-commerce order system with Nuxt 3 frontend and Rails backend, featuring stock management, payment processing, and logistics tracking.
+A full-stack e-commerce order system with Nuxt 3 frontend and Express.js mock backend.
 
 ## Features
 
 ### Stock Management
-- Real-time inventory tracking
+- Real-time inventory tracking with stock level updates
 - Low stock alerts (visual indicators for products with 5 or fewer items)
 - Out of stock indicators and purchase prevention
-- Stock level updates when items are added to cart
+- Stock level reporting
 
 ### Payment Processing
 - Multiple payment methods (Credit Card, PayPal)
@@ -22,50 +22,41 @@ A full-stack e-commerce order system with Nuxt 3 frontend and Rails backend, fea
 - Estimated delivery dates
 - Tracking number and carrier information
 
-## Frontend (Nuxt 3)
+## Project Structure
 
-The frontend is built with Nuxt 3 and includes:
+### Frontend (Nuxt 3)
+- `frontend/`: Nuxt 3 application with Tailwind CSS
+  - `pages/`: Application pages (home, products, cart, checkout, orders)
+  - `components/`: Reusable Vue components
+  - `stores/`: Pinia stores for state management
+  - `assets/`: CSS and other static assets
 
-- Product listing page with stock indicators
-- Interactive shopping cart with localStorage persistence
-- Checkout page with customer information and payment forms
-- Order confirmation page with tracking information
-- Order history page
-
-## Backend (Mock API)
-
-The backend is implemented as a mock API server using Express.js with the following endpoints:
-
-- `/api/v1/products` - Get all products
-- `/api/v1/orders` - Create and list orders
-- `/api/v1/orders/:id` - Get order details
-- `/api/v1/orders/:id/order_items` - Add items to an order
-- `/api/v1/orders/:id/payments` - Process payments for an order
+### Backend (Express.js Mock API)
+- `backend/mock-api/`: Express.js server with mock API endpoints
+  - `server.js`: API implementation with in-memory data storage
 
 ## Getting Started
 
-### Running the Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### Running the Mock API Server
-
+### Start the Backend
 ```bash
 cd backend/mock-api
 npm install
 node server.js
 ```
 
+### Start the Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
 ## User Journey
 
-1. Browse products on the home page
-2. Add products to cart
-3. Proceed to checkout
-4. Enter shipping and payment information
-5. Complete order
-6. View order confirmation with tracking details
-7. Check order history
+1. Browse products on the home/products page
+2. Add items to cart with real-time stock updates
+3. View and manage cart (add, remove, update quantities)
+4. Proceed to checkout
+5. Enter shipping and payment information
+6. Receive order confirmation with tracking details
+7. View order history and track order status

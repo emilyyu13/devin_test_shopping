@@ -2,127 +2,196 @@
   <div class="container mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold mb-8">Checkout</h1>
     
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Checkout Form -->
-      <div class="lg:col-span-2">
-        <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-          <div class="p-6">
-            <h2 class="text-xl font-semibold mb-4">Shipping Information</h2>
-            <form @submit.prevent="submitOrder">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div>
-                  <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
-                  <input type="text" id="firstName" v-model="shippingInfo.firstName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                </div>
-                <div>
-                  <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
-                  <input type="text" id="lastName" v-model="shippingInfo.lastName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                </div>
+    <div v-if="isEmpty" class="text-center py-12">
+      <p class="text-xl text-gray-600 mb-6">Your cart is empty</p>
+      <NuxtLink to="/products" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">
+        Browse Products
+      </NuxtLink>
+    </div>
+    
+    <div v-else class="flex flex-col md:flex-row gap-8">
+      <div class="md:w-2/3">
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 class="text-xl font-semibold mb-4">Shipping Information</h2>
+          
+          <form @submit.prevent="submitOrder" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                <input 
+                  id="fullName" 
+                  v-model="formData.fullName" 
+                  type="text" 
+                  class="w-full p-2 border rounded-md"
+                  required
+                >
               </div>
               
-              <div class="mb-4">
-                <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                <input type="text" id="address" v-model="shippingInfo.address" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-              </div>
-              
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div>
-                  <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
-                  <input type="text" id="city" v-model="shippingInfo.city" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                </div>
-                <div>
-                  <label for="state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
-                  <input type="text" id="state" v-model="shippingInfo.state" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                </div>
-                <div>
-                  <label for="zipCode" class="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
-                  <input type="text" id="zipCode" v-model="shippingInfo.zipCode" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                </div>
-              </div>
-              
-              <div class="mb-6">
+              <div>
                 <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input type="email" id="email" v-model="shippingInfo.email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                <input 
+                  id="email" 
+                  v-model="formData.email" 
+                  type="email" 
+                  class="w-full p-2 border rounded-md"
+                  required
+                >
+              </div>
+            </div>
+            
+            <div>
+              <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+              <input 
+                id="address" 
+                v-model="formData.address" 
+                type="text" 
+                class="w-full p-2 border rounded-md"
+                required
+              >
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                <input 
+                  id="city" 
+                  v-model="formData.city" 
+                  type="text" 
+                  class="w-full p-2 border rounded-md"
+                  required
+                >
               </div>
               
-              <div class="mb-6">
-                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                <input type="tel" id="phone" v-model="shippingInfo.phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+              <div>
+                <label for="state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
+                <input 
+                  id="state" 
+                  v-model="formData.state" 
+                  type="text" 
+                  class="w-full p-2 border rounded-md"
+                  required
+                >
               </div>
-            </form>
-          </div>
+              
+              <div>
+                <label for="zipCode" class="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
+                <input 
+                  id="zipCode" 
+                  v-model="formData.zipCode" 
+                  type="text" 
+                  class="w-full p-2 border rounded-md"
+                  required
+                >
+              </div>
+            </div>
+          </form>
         </div>
         
-        <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-          <div class="p-6">
-            <h2 class="text-xl font-semibold mb-4">Payment Information</h2>
-            <div class="mb-4">
-              <label for="cardNumber" class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
-              <input type="text" id="cardNumber" v-model="paymentInfo.cardNumber" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="**** **** **** ****" required>
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-4">Payment Method</h2>
+          
+          <div class="space-y-4">
+            <div class="flex items-center">
+              <input 
+                id="creditCard" 
+                v-model="formData.paymentMethod" 
+                type="radio" 
+                value="credit_card" 
+                class="mr-2"
+              >
+              <label for="creditCard">Credit Card</label>
             </div>
             
-            <div class="grid grid-cols-2 gap-4 mb-6">
+            <div v-if="formData.paymentMethod === 'credit_card'" class="pl-6 space-y-4">
               <div>
-                <label for="expiryDate" class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
-                <input type="text" id="expiryDate" v-model="paymentInfo.expiryDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="MM/YY" required>
+                <label for="cardNumber" class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+                <input 
+                  id="cardNumber" 
+                  v-model="formData.cardNumber" 
+                  type="text" 
+                  class="w-full p-2 border rounded-md"
+                  placeholder="**** **** **** ****"
+                  required
+                >
               </div>
-              <div>
-                <label for="cvv" class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
-                <input type="text" id="cvv" v-model="paymentInfo.cvv" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="***" required>
+              
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label for="expiryDate" class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
+                  <input 
+                    id="expiryDate" 
+                    v-model="formData.expiryDate" 
+                    type="text" 
+                    class="w-full p-2 border rounded-md"
+                    placeholder="MM/YY"
+                    required
+                  >
+                </div>
+                
+                <div>
+                  <label for="cvv" class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+                  <input 
+                    id="cvv" 
+                    v-model="formData.cvv" 
+                    type="text" 
+                    class="w-full p-2 border rounded-md"
+                    placeholder="***"
+                    required
+                  >
+                </div>
               </div>
             </div>
             
-            <div class="mb-6">
-              <label for="nameOnCard" class="block text-sm font-medium text-gray-700 mb-1">Name on Card</label>
-              <input type="text" id="nameOnCard" v-model="paymentInfo.nameOnCard" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            <div class="flex items-center">
+              <input 
+                id="paypal" 
+                v-model="formData.paymentMethod" 
+                type="radio" 
+                value="paypal" 
+                class="mr-2"
+              >
+              <label for="paypal">PayPal</label>
             </div>
           </div>
         </div>
       </div>
       
-      <!-- Order Summary -->
-      <div class="lg:col-span-1">
-        <div class="bg-white rounded-lg shadow-md overflow-hidden sticky top-4">
-          <div class="p-6">
-            <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
-            <div class="space-y-3 mb-6">
-              <div v-for="item in cartItems" :key="item.id" class="flex justify-between">
-                <span class="text-gray-600">{{ item.name }} x{{ item.quantity }}</span>
-                <span>${{ (item.price * item.quantity).toFixed(2) }}</span>
-              </div>
-              <div class="border-t border-gray-200 pt-3 mt-3">
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Subtotal</span>
-                  <span>${{ subtotal.toFixed(2) }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Shipping</span>
-                  <span>${{ shipping.toFixed(2) }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Tax</span>
-                  <span>${{ tax.toFixed(2) }}</span>
-                </div>
-                <div class="flex justify-between font-bold mt-3 pt-3 border-t border-gray-200">
-                  <span>Total</span>
-                  <span>${{ total.toFixed(2) }}</span>
-                </div>
-              </div>
+      <div class="md:w-1/3">
+        <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
+          <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
+          
+          <div class="space-y-3 mb-6">
+            <div class="flex justify-between">
+              <span>Subtotal</span>
+              <span>${{ subtotal.toFixed(2) }}</span>
             </div>
             
-            <button 
-              @click="submitOrder" 
-              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg text-center transition duration-300"
-            >
-              Place Order
-            </button>
+            <div class="flex justify-between">
+              <span>Tax (8%)</span>
+              <span>${{ tax.toFixed(2) }}</span>
+            </div>
             
-            <div class="mt-4 text-center text-sm text-gray-600">
-              By placing your order, you agree to our 
-              <a href="#" class="text-blue-600 hover:text-blue-800">Terms of Service</a> and 
-              <a href="#" class="text-blue-600 hover:text-blue-800">Privacy Policy</a>.
+            <div class="flex justify-between">
+              <span>Shipping</span>
+              <span>{{ shipping > 0 ? '$' + shipping.toFixed(2) : 'Free' }}</span>
+            </div>
+            
+            <div class="border-t pt-3 mt-3">
+              <div class="flex justify-between font-bold">
+                <span>Total</span>
+                <span>${{ total.toFixed(2) }}</span>
+              </div>
             </div>
           </div>
+          
+          <button 
+            @click="submitOrder" 
+            class="block w-full py-3 bg-blue-600 text-white text-center rounded-md hover:bg-blue-700 transition duration-300"
+            :disabled="!formData.paymentMethod"
+            :class="{ 'opacity-50 cursor-not-allowed': !formData.paymentMethod }"
+          >
+            Place Order
+          </button>
         </div>
       </div>
     </div>
@@ -130,80 +199,67 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useCartStore } from '~/stores/cart';
+import { useOrderStore } from '~/stores/orders';
 
 const router = useRouter();
+const cartStore = useCartStore();
+const orderStore = useOrderStore();
 
-// Mock cart data
-const cartItems = ref([
-  {
-    id: 1,
-    name: 'Wireless Headphones',
-    price: 199.99,
-    quantity: 1
-  },
-  {
-    id: 2,
-    name: 'Smart Watch',
-    price: 249.99,
-    quantity: 2
-  },
-  {
-    id: 8,
-    name: 'Wireless Mouse',
-    price: 24.99,
-    quantity: 1
-  }
-]);
-
-// Form data
-const shippingInfo = ref({
-  firstName: '',
-  lastName: '',
+const formData = ref({
+  fullName: '',
+  email: '',
   address: '',
   city: '',
   state: '',
   zipCode: '',
-  email: '',
-  phone: ''
-});
-
-const paymentInfo = ref({
+  paymentMethod: 'credit_card',
   cardNumber: '',
   expiryDate: '',
-  cvv: '',
-  nameOnCard: ''
+  cvv: ''
 });
 
-// Computed properties
-const subtotal = computed(() => {
-  return cartItems.value.reduce((total, item) => total + (item.price * item.quantity), 0);
-});
+const cartItems = computed(() => cartStore.cartItems);
+const isEmpty = computed(() => cartStore.isEmpty);
+const subtotal = computed(() => cartStore.subtotal);
+const tax = computed(() => cartStore.tax);
+const shipping = computed(() => cartStore.shipping);
+const total = computed(() => cartStore.total);
 
-const shipping = computed(() => {
-  return subtotal.value > 100 ? 0 : 10;
-});
-
-const tax = computed(() => {
-  return subtotal.value * 0.08; // 8% tax
-});
-
-const total = computed(() => {
-  return subtotal.value + shipping.value + tax.value;
-});
-
-// Functions
-const submitOrder = () => {
-  // In a real application, this would send the order data to an API
-  console.log('Order submitted:', {
-    items: cartItems.value,
-    shipping: shippingInfo.value,
-    payment: paymentInfo.value,
-    total: total.value
-  });
+const submitOrder = async () => {
+  if (isEmpty.value) {
+    return;
+  }
   
-  // Navigate to confirmation page
-  router.push('/checkout/confirmation');
+  const orderData = {
+    user_name: formData.value.fullName,
+    email: formData.value.email,
+    address: `${formData.value.address}, ${formData.value.city}, ${formData.value.state} ${formData.value.zipCode}`,
+    payment_method: formData.value.paymentMethod
+  };
+  
+  try {
+    const result = await orderStore.completeCheckout(orderData, cartItems.value);
+    
+    if (result && result.order) {
+      // Redirect to confirmation page
+      router.push(`/checkout/confirmation?id=${result.order.id}`);
+    }
+  } catch (error) {
+    console.error('Error placing order:', error);
+    // Show error notification
+  }
 };
+
+onMounted(() => {
+  // Load cart from localStorage
+  cartStore.loadCart();
+  
+  // Redirect to products page if cart is empty
+  if (isEmpty.value) {
+    router.push('/products');
+  }
+});
 </script>

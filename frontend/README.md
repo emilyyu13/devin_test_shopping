@@ -1,43 +1,60 @@
 # E-Commerce Order System Frontend
 
-This is the frontend for the e-commerce order system built with Nuxt 3 and Tailwind CSS.
+This is the frontend for the E-Commerce Order System, built with Nuxt 3 and Tailwind CSS.
 
 ## Features
 
 - Product browsing and filtering
 - Shopping cart management
 - Checkout process
-- Order tracking and history
+- Order tracking
 - Stock management
 - Payment processing
-- Logistics tracking
 
-## Pages
+## Setup
 
-- Home: Featured products and categories
-- Products: Browse and filter products
-- Product Detail: View product details and add to cart
-- Cart: Manage cart items and proceed to checkout
-- Checkout: Enter shipping and payment information
-- Order Confirmation: View order details after purchase
-- Orders: View order history and track shipments
+```bash
+# Install dependencies
+npm install
 
-## Components
+# Start development server
+npm run dev
 
-- Product components: ProductCard, ProductDetail
-- Cart components: CartItem, CartSummary
-- Checkout components: ShippingForm, PaymentForm, OrderSummary
-- Order components: OrderStatus, OrderTracking
+# Build for production
+npm run build
+```
+
+## Project Structure
+
+- `assets/`: CSS and other static assets
+- `components/`: Reusable Vue components
+- `pages/`: Application pages and routes
+- `stores/`: Pinia stores for state management
+- `public/`: Static files served at root path
+
+## API Integration
+
+The frontend communicates with the backend API for:
+
+- Product data and stock levels
+- Order creation and management
+- Payment processing
+- Shipping and logistics tracking
 
 ## State Management
 
 The application uses Pinia for state management with the following stores:
 
-- Products: Manages product data and inventory
-- Cart: Manages shopping cart items and calculations
-- Orders: Manages order creation and history
-- User: Manages user authentication and profile (to be implemented)
+- `products`: Product catalog and stock management
+- `cart`: Shopping cart functionality
+- `orders`: Order creation and tracking
 
-## API Integration
+## User Journey
 
-The frontend communicates with the Rails backend API through the API service layer.
+1. Browse products on the home/products page
+2. Add items to cart
+3. View and manage cart
+4. Proceed to checkout
+5. Enter shipping and payment information
+6. Receive order confirmation
+7. Track order status
