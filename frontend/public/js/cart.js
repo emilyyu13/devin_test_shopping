@@ -8,6 +8,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     total: 0
   };
 
+  // Load cart from localStorage if available
+  const savedCart = localStorage.getItem('cart');
+  if (savedCart) {
+    try {
+      cart = JSON.parse(savedCart);
+    } catch (error) {
+      console.error('Failed to parse saved cart:', error);
+    }
+  }
+
   // Product data
   let products = [];
   
@@ -84,50 +94,14 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Add checkout button event listener
   const checkoutButton = document.getElementById('checkout-button');
   if (checkoutButton) {
-    checkoutButton.addEventListener('click', async function() {
+    checkoutButton.addEventListener('click', function() {
       if (cart.items.length === 0) return;
       
-      try {
-        // In a real app, we would collect user information from a form
-        const orderData = {
-          user_name: 'John Doe',
-          email: 'john.doe@example.com',
-          address: '123 Main St, Anytown, USA',
-          status: 'pending'
-        };
-        
-        // Create order
-        const order = await createOrder(orderData);
-        console.log('Order created:', order);
-        
-        // Add order items
-        for (const item of cart.items) {
-          await addOrderItem(order.id, {
-            product_id: item.id,
-            quantity: item.quantity,
-            price: item.price
-          });
-        }
-        
-        // Process payment
-        const payment = await createPayment(order.id, {
-          payment_method: 'credit_card'
-        });
-        console.log('Payment processed:', payment);
-        
-        // Get updated order
-        const updatedOrder = await getOrder(order.id);
-        console.log('Updated order:', updatedOrder);
-        
-        // Clear cart
-        cart.items = [];
-        updateCartDisplay();
-        
-        alert('Order placed successfully! Order ID: ' + order.id);
-      } catch (error) {
-        console.error('Checkout failed:', error);
-        alert('Checkout failed: ' + error.message);
-      }
+      // Save cart to localStorage
+      localStorage.setItem('cart', JSON.stringify(cart));
+      
+      // Redirect to checkout page
+      window.location.href = '/checkout/';
     });
   }
 
@@ -207,6 +181,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Update cart display
     updateCartDisplay();
     
+    // Save cart to localStorage
+    localStorage.setItem('cart', JSON.stringify(cart));
+    
     // Show confirmation
     alert(`${product.name} added to cart!`);
   }
@@ -237,6 +214,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Update cart display
     updateCartDisplay();
+    
+    // Save cart to localStorage
+    localStorage.setItem('cart', JSON.stringify(cart));
   }
 
   // Remove from cart function
@@ -256,6 +236,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Update cart display
     updateCartDisplay();
+    
+    // Save cart to localStorage
+    localStorage.setItem('cart', JSON.stringify(cart));
   }
 
   // Update cart display

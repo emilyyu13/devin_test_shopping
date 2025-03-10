@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmation - E-Commerce Order System</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="/js/api.js"></script>
+</head>
+<body class="bg-gray-100">
+  <div class="container mx-auto px-4 py-8">
+    <div class="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
+      <div class="text-center mb-8">
+        <div class="inline-block p-4 rounded-full bg-green-100 text-green-600 mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <h1 class="text-3xl font-bold mb-2">Order Confirmed!</h1>
+        <p class="text-gray-600">Thank you for your purchase. Your order has been received and is being processed.</p>
+      </div>
+      
+      <div class="mb-6">
+        <h2 class="text-xl font-semibold mb-2">Order Details</h2>
+        <div class="border rounded-lg overflow-hidden">
+          <div class="grid grid-cols-2 gap-4 p-4 border-b">
+            <div>
+              <p class="text-gray-600">Order Number:</p>
+              <p class="font-semibold" id="order-id">Loading...</p>
+            </div>
+            <div>
+              <p class="text-gray-600">Date:</p>
+              <p class="font-semibold" id="order-date">Loading...</p>
+            </div>
+          </div>
+          <div class="p-4">
+            <p class="text-gray-600">Status:</p>
+            <p class="font-semibold text-blue-600" id="order-status">Processing</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mb-6">
+        <h2 class="text-xl font-semibold mb-2">Shipping Information</h2>
+        <div class="border rounded-lg p-4">
+          <p class="font-semibold mb-1" id="shipping-name">Loading...</p>
+          <p class="text-gray-600" id="shipping-address">Loading...</p>
+          <div class="mt-4">
+            <p class="text-gray-600">Estimated Delivery:</p>
+            <p class="font-semibold" id="estimated-delivery">Loading...</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold mb-2">Track Your Order</h2>
+        <div class="border rounded-lg p-4">
+          <div class="relative">
+            <div class="absolute left-0 top-0 h-full w-1 bg-gray-200"></div>
+            <div class="absolute left-0 top-0 h-1/2 w-1 bg-blue-600" id="progress-bar"></div>
+            
+            <div class="relative pl-8 pb-8">
+              <div class="absolute left-0 top-0 w-5 h-5 rounded-full bg-blue-600 -ml-2"></div>
+              <div>
+                <p class="font-semibold">Order Placed</p>
+                <p class="text-gray-600" id="order-placed-date">Loading...</p>
+              </div>
+            </div>
+            
+            <div class="relative pl-8 pb-8">
+              <div class="absolute left-0 top-0 w-5 h-5 rounded-full bg-blue-600 -ml-2"></div>
+              <div>
+                <p class="font-semibold">Processing</p>
+                <p class="text-gray-600" id="processing-date">Loading...</p>
+              </div>
+            </div>
+            
+            <div class="relative pl-8 pb-8">
+              <div class="absolute left-0 top-0 w-5 h-5 rounded-full bg-gray-300 -ml-2" id="shipped-indicator"></div>
+              <div>
+                <p class="font-semibold" id="shipped-text">Shipped</p>
+                <p class="text-gray-600" id="shipped-date">Pending</p>
+              </div>
+            </div>
+            
+            <div class="relative pl-8">
+              <div class="absolute left-0 top-0 w-5 h-5 rounded-full bg-gray-300 -ml-2" id="delivered-indicator"></div>
+              <div>
+                <p class="font-semibold" id="delivered-text">Delivered</p>
+                <p class="text-gray-600" id="delivered-date">Pending</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-6 pt-4 border-t">
+            <p class="text-gray-600">Tracking Number:</p>
+            <p class="font-semibold" id="tracking-number">Loading...</p>
+            <p class="text-gray-600 mt-2">Carrier:</p>
+            <p class="font-semibold" id="carrier">Loading...</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="text-center">
+        <a href="/" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg inline-block">Continue Shopping</a>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Get order ID from localStorage
+      const orderId = localStorage.getItem('lastOrderId');
+      
+      if (!orderId) {
+        window.location.href = '/'; // Redirect to home if no order ID
+        return;
+      }
+      
+      try {
+        // Fetch order details
+        const order = await getOrder(orderId);
+        console.log('Order details:', order);
+        
+        // Update order details
+        document.getElementById('order-id').textContent = `#${order.id}`;
+        document.getElementById('order-date').textContent = new Date().toLocaleDateString();
+        document.getElementById('order-status').textContent = order.status.charAt(0).toUpperCase() + order.status.slice(1);
+        
+        // Update shipping information
+        document.getElementById('shipping-name').textContent = order.user_name;
+        document.getElementById('shipping-address').textContent = order.address;
+        document.getElementById('estimated-delivery').textContent = new Date(order.estimated_delivery).toLocaleDateString();
+        
+        // Update tracking information
+        document.getElementById('tracking-number').textContent = order.tracking_number || 'Not available yet';
+        document.getElementById('carrier').textContent = order.carrier || 'Not assigned yet';
+        
+        // Update order timeline
+        const orderDate = new Date();
+        document.getElementById('order-placed-date').textContent = orderDate.toLocaleString();
+        
+        const processingDate = new Date(orderDate.getTime() + 30 * 60000); // 30 minutes later
+        document.getElementById('processing-date').textContent = processingDate.toLocaleString();
+        
+        // Update progress based on status
+        if (order.status === 'shipped' || order.status === 'delivered') {
+          document.getElementById('shipped-indicator').classList.remove('bg-gray-300');
+          document.getElementById('shipped-indicator').classList.add('bg-blue-600');
+          document.getElementById('shipped-text').classList.add('text-blue-600');
+          
+          const shippedDate = new Date(processingDate.getTime() + 24 * 60 * 60000); // 1 day later
+          document.getElementById('shipped-date').textContent = shippedDate.toLocaleString();
+          document.getElementById('progress-bar').style.height = '75%';
+        }
+        
+        if (order.status === 'delivered') {
+          document.getElementById('delivered-indicator').classList.remove('bg-gray-300');
+          document.getElementById('delivered-indicator').classList.add('bg-blue-600');
+          document.getElementById('delivered-text').classList.add('text-blue-600');
+          
+          const deliveredDate = new Date(processingDate.getTime() + 5 * 24 * 60 * 60000); // 5 days later
+          document.getElementById('delivered-date').textContent = deliveredDate.toLocaleString();
+          document.getElementById('progress-bar').style.height = '100%';
+        }
+      } catch (error) {
+        console.error('Failed to load order details:', error);
+        alert('Failed to load order details: ' + error.message);
+      }
+    });
+  </script>
+</body>
+</html>

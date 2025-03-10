@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - E-Commerce Order System</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="/js/api.js"></script>
+</head>
+<body class="bg-gray-100">
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8 text-center">Checkout</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Customer Information -->
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4">Customer Information</h2>
+        <form id="checkout-form">
+          <div class="mb-4">
+            <label class="block text-gray-700 mb-1" for="name">Full Name</label>
+            <input type="text" id="name" name="name" class="w-full p-2 border rounded" required>
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700 mb-1" for="email">Email Address</label>
+            <input type="email" id="email" name="email" class="w-full p-2 border rounded" required>
+          </div>
+          <div class="mb-4">
+            <label class="block text-gray-700 mb-1" for="address">Shipping Address</label>
+            <textarea id="address" name="address" class="w-full p-2 border rounded" rows="3" required></textarea>
+          </div>
+          
+          <h2 class="text-xl font-semibold mb-4 mt-8">Payment Method</h2>
+          <div class="mb-4">
+            <div class="flex items-center mb-2">
+              <input type="radio" id="credit-card" name="payment-method" value="credit_card" class="mr-2" checked>
+              <label for="credit-card">Credit Card</label>
+            </div>
+            <div class="pl-6 grid grid-cols-1 gap-4">
+              <div>
+                <label class="block text-gray-700 mb-1">Card Number</label>
+                <input type="text" id="card-number" placeholder="1234 5678 9012 3456" class="w-full p-2 border rounded">
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-gray-700 mb-1">Expiration Date</label>
+                  <input type="text" id="expiry" placeholder="MM/YY" class="w-full p-2 border rounded">
+                </div>
+                <div>
+                  <label class="block text-gray-700 mb-1">CVV</label>
+                  <input type="text" id="cvv" placeholder="123" class="w-full p-2 border rounded">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <div class="flex items-center mb-2">
+              <input type="radio" id="paypal" name="payment-method" value="paypal" class="mr-2">
+              <label for="paypal">PayPal</label>
+            </div>
+            <div class="pl-6">
+              <p class="text-gray-600">You will be redirected to PayPal to complete your payment.</p>
+            </div>
+          </div>
+          
+          <button type="submit" class="mt-6 w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold">Place Order</button>
+        </form>
+      </div>
+      
+      <!-- Order Summary -->
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
+        <div id="order-items">
+          <!-- Order items will be loaded from localStorage -->
+        </div>
+        <div class="border-t pt-4 mt-4">
+          <div class="flex justify-between mb-2">
+            <span>Subtotal:</span>
+            <span id="subtotal">$0.00</span>
+          </div>
+          <div class="flex justify-between mb-2">
+            <span>Tax (8%):</span>
+            <span id="tax">$0.00</span>
+          </div>
+          <div class="flex justify-between mb-4">
+            <span>Shipping:</span>
+            <span id="shipping">$0.00</span>
+          </div>
+          <div class="flex justify-between font-bold text-lg border-t pt-4">
+            <span>Total:</span>
+            <span id="total">$0.00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-8 text-center">
+      <a href="/" class="text-blue-600 hover:text-blue-800">← Return to Shopping</a>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Load cart data from localStorage
+      const cartData = JSON.parse(localStorage.getItem('cart') || '{"items":[],"subtotal":0,"tax":0,"shipping":0,"total":0}');
+      
+      // Update order summary
+      const orderItemsContainer = document.getElementById('order-items');
+      const subtotalElement = document.getElementById('subtotal');
+      const taxElement = document.getElementById('tax');
+      const shippingElement = document.getElementById('shipping');
+      const totalElement = document.getElementById('total');
+      
+      // Display order items
+      orderItemsContainer.innerHTML = '';
+      
+      if (cartData.items.length === 0) {
+        orderItemsContainer.innerHTML = '<p class="text-gray-500 text-center py-4">Your cart is empty</p>';
+        window.location.href = '/'; // Redirect to home if cart is empty
+      } else {
+        cartData.items.forEach(item => {
+          const itemElement = document.createElement('div');
+          itemElement.className = 'flex justify-between items-center mb-4';
+          itemElement.innerHTML = `
+            <div class="flex items-center">
+              <img src="${item.image}" alt="${item.name}" class="w-12 h-12 object-cover rounded mr-4">
+              <div>
+                <h3 class="font-semibold">${item.name}</h3>
+                <p class="text-gray-600">Qty: ${item.quantity}</p>
+              </div>
+            </div>
+            <span>$${(item.price * item.quantity).toFixed(2)}</span>
+          `;
+          orderItemsContainer.appendChild(itemElement);
+        });
+      }
+      
+      // Update totals
+      subtotalElement.textContent = '$' + cartData.subtotal.toFixed(2);
+      taxElement.textContent = '$' + cartData.tax.toFixed(2);
+      shippingElement.textContent = cartData.shipping === 0 ? 'Free' : '$' + cartData.shipping.toFixed(2);
+      totalElement.textContent = '$' + cartData.total.toFixed(2);
+      
+      // Handle form submission
+      const checkoutForm = document.getElementById('checkout-form');
+      checkoutForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const address = document.getElementById('address').value;
+        const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+        
+        try {
+          // Create order
+          const orderData = {
+            user_name: name,
+            email: email,
+            address: address,
+            status: 'pending'
+          };
+          
+          const order = await createOrder(orderData);
+          console.log('Order created:', order);
+          
+          // Add order items
+          for (const item of cartData.items) {
+            await addOrderItem(order.id, {
+              product_id: item.id,
+              quantity: item.quantity,
+              price: item.price
+            });
+          }
+          
+          // Process payment
+          const payment = await createPayment(order.id, {
+            payment_method: paymentMethod
+          });
+          console.log('Payment processed:', payment);
+          
+          // Clear cart
+          localStorage.setItem('cart', JSON.stringify({
+            items: [],
+            subtotal: 0,
+            tax: 0,
+            shipping: 0,
+            total: 0
+          }));
+          
+          // Store order ID for confirmation page
+          localStorage.setItem('lastOrderId', order.id);
+          
+          // Redirect to confirmation page
+          window.location.href = '/confirmation/';
+        } catch (error) {
+          console.error('Checkout failed:', error);
+          alert('Checkout failed: ' + error.message);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
