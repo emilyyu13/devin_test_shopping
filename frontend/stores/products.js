@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import { useApi } from '~/services/api';
 
 export const useProductStore = defineStore('products', {
   state: () => ({
@@ -9,157 +8,133 @@ export const useProductStore = defineStore('products', {
         name: 'Wireless Headphones',
         description: 'Premium noise-cancelling wireless headphones with 30-hour battery life.',
         price: 199.99,
-        image: 'https://placehold.co/300x200?text=Headphones',
         stock: 15,
-        categoryId: 1
+        image: 'https://placehold.co/300x200?text=Headphones',
+        category: 'Electronics'
       },
       {
         id: 2,
         name: 'Smart Watch',
         description: 'Track your fitness and stay connected with this advanced smartwatch.',
         price: 249.99,
-        image: 'https://placehold.co/300x200?text=SmartWatch',
         stock: 3,
-        categoryId: 1
+        image: 'https://placehold.co/300x200?text=SmartWatch',
+        category: 'Electronics'
       },
       {
         id: 3,
         name: 'Bluetooth Speaker',
         description: 'Portable waterproof speaker with amazing sound quality.',
         price: 79.99,
-        image: 'https://placehold.co/300x200?text=Speaker',
         stock: 0,
-        categoryId: 1
+        image: 'https://placehold.co/300x200?text=Speaker',
+        category: 'Electronics'
       },
       {
         id: 4,
         name: 'Laptop Backpack',
         description: 'Durable backpack with anti-theft features and USB charging port.',
         price: 59.99,
-        image: 'https://placehold.co/300x200?text=Backpack',
         stock: 22,
-        categoryId: 2
+        image: 'https://placehold.co/300x200?text=Backpack',
+        category: 'Accessories'
       },
       {
         id: 5,
         name: 'Coffee Maker',
         description: 'Programmable coffee maker with thermal carafe to keep your coffee hot.',
         price: 89.99,
-        image: 'https://placehold.co/300x200?text=CoffeeMaker',
         stock: 7,
-        categoryId: 3
+        image: 'https://placehold.co/300x200?text=CoffeeMaker',
+        category: 'Home'
       },
       {
         id: 6,
         name: 'Yoga Mat',
         description: 'Non-slip yoga mat with alignment lines for proper positioning.',
         price: 29.99,
-        image: 'https://placehold.co/300x200?text=YogaMat',
         stock: 18,
-        categoryId: 4
+        image: 'https://placehold.co/300x200?text=YogaMat',
+        category: 'Fitness'
       },
       {
         id: 7,
         name: 'Desk Lamp',
         description: 'LED desk lamp with adjustable brightness and color temperature.',
         price: 39.99,
-        image: 'https://placehold.co/300x200?text=DeskLamp',
         stock: 12,
-        categoryId: 3
+        image: 'https://placehold.co/300x200?text=DeskLamp',
+        category: 'Home'
       },
       {
         id: 8,
         name: 'Wireless Mouse',
         description: 'Ergonomic wireless mouse with long battery life and precise tracking.',
         price: 24.99,
-        image: 'https://placehold.co/300x200?text=Mouse',
         stock: 5,
-        categoryId: 1
+        image: 'https://placehold.co/300x200?text=Mouse',
+        category: 'Electronics'
       }
     ],
-    
-    categories: [
-      { id: 1, name: 'Electronics', image: 'https://placehold.co/300x200?text=Electronics' },
-      { id: 2, name: 'Clothing', image: 'https://placehold.co/300x200?text=Clothing' },
-      { id: 3, name: 'Home & Kitchen', image: 'https://placehold.co/300x200?text=Home' },
-      { id: 4, name: 'Sports & Outdoors', image: 'https://placehold.co/300x200?text=Sports' }
-    ],
-    
     loading: false,
     error: null
   }),
   
   getters: {
     getProductById: (state) => (id) => {
-      return state.products.find(product => product.id === Number(id));
+      return state.products.find(product => product.id === id);
     },
     
-    getProductsByCategory: (state) => (categoryId) => {
-      if (!categoryId) return state.products;
-      return state.products.filter(product => product.categoryId === categoryId);
+    availableProducts: (state) => {
+      return state.products.filter(product => product.stock > 0);
     },
     
-    getCategories: (state) => {
-      return state.categories;
+    lowStockProducts: (state) => {
+      return state.products.filter(product => product.stock > 0 && product.stock <= 5);
+    },
+    
+    outOfStockProducts: (state) => {
+      return state.products.filter(product => product.stock === 0);
     }
   },
   
   actions: {
-    async fetchProducts() {
-      const api = useApi();
+    fetchProducts() {
       this.loading = true;
       this.error = null;
       
-      try {
-        // In a real implementation, this would fetch from the API
-        // const products = await api.get('/products');
-        // this.products = products;
-        
-        // Using mock data for now
-        // this.products already populated in state
-      } catch (error) {
-        this.error = error.message;
-        console.error('Error fetching products:', error);
-      } finally {
+      // In a real app, this would be an API call
+      setTimeout(() => {
+        // Products are already loaded in state
         this.loading = false;
-      }
+      }, 500);
     },
     
-    async fetchProduct(id) {
-      const api = useApi();
-      this.loading = true;
-      this.error = null;
-      
-      try {
-        // In a real implementation, this would fetch from the API
-        // const product = await api.get(`/products/${id}`);
-        // Update the product in the store
-        // const index = this.products.findIndex(p => p.id === product.id);
-        // if (index !== -1) {
-        //   this.products[index] = product;
-        // } else {
-        //   this.products.push(product);
-        // }
-        
-        // Using mock data for now
-        // Product already in state
-      } catch (error) {
-        this.error = error.message;
-        console.error(`Error fetching product ${id}:`, error);
-      } finally {
-        this.loading = false;
-      }
-    },
-    
-    async updateProductStock(productId, quantity) {
+    updateProductStock(productId, quantityChange) {
       const product = this.getProductById(productId);
+      
       if (product) {
-        // In a real implementation, this would update via the API
-        // await api.put(`/products/${productId}`, { stock: product.stock - quantity });
+        // Decrease stock by the quantity ordered
+        product.stock -= quantityChange;
         
-        // Update locally for now
-        product.stock = Math.max(0, product.stock - quantity);
+        // Ensure stock doesn't go below 0
+        if (product.stock < 0) {
+          product.stock = 0;
+        }
+        
+        // In a real app, we would update the stock on the server
+        // return api.updateProductStock(productId, product.stock);
       }
+    },
+    
+    isLowStock(productId) {
+      const product = this.getProductById(productId);
+      return product && product.stock > 0 && product.stock <= 5;
+    },
+    
+    isOutOfStock(productId) {
+      const product = this.getProductById(productId);
+      return product && product.stock === 0;
     }
   }
 });
