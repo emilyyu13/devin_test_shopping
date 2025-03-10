@@ -16,13 +16,9 @@ export default {
 
   runtimeConfig: {
     public: {
-      apiBaseUrl: 'http://localhost:3000/api/v1'
+      apiBaseUrl: 'http://localhost:3001/api/v1'
     }
   },
 
-  compatibilityDate: '2025-03-10',
-  
-  pinia: {
-    autoImports: ['defineStore', 'storeToRefs']
-  }
+  compatibilityDate: '2025-03-10'
 }
