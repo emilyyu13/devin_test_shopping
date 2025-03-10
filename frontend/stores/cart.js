@@ -4,54 +4,42 @@ import { useProductStore } from './products';
 export const useCartStore = defineStore('cart', {
   state: () => ({
     items: [],
-    loading: false,
-    error: null
+    checkoutStatus: null
   }),
   
   getters: {
-    itemCount: (state) => {
-      return state.items.reduce((total, item) => total + item.quantity, 0);
-    },
+    cartItems: (state) => state.items,
+    
+    itemCount: (state) => state.items.reduce((count, item) => count + item.quantity, 0),
     
     subtotal: (state) => {
-      return state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+      return state.items.reduce((total, item) => {
+        return total + (item.price * item.quantity);
+      }, 0);
     },
     
-    tax: (state) => {
-      return state.subtotal * 0.08; // 8% tax
-    },
+    tax: (state, getters) => getters.subtotal * 0.08,
     
-    shipping: (state) => {
-      return state.subtotal > 100 ? 0 : 10; // Free shipping for orders over $100
-    },
+    shipping: (state, getters) => getters.subtotal > 100 ? 0 : 10,
     
-    total: (state) => {
-      return state.subtotal + state.tax + state.shipping;
-    }
+    total: (state, getters) => getters.subtotal + getters.tax + getters.shipping
   },
   
   actions: {
-    addToCart(product, quantity = 1) {
+    addToCart(product) {
       const productStore = useProductStore();
       
       // Check if product is in stock
-      if (product.stock < quantity) {
-        this.error = 'Not enough stock available';
-        return false;
+      if (product.stock <= 0) {
+        throw new Error('Product is out of stock');
       }
       
-      // Check if product is already in cart
-      const existingItem = this.items.find(item => item.id === product.id);
+      // Find item in cart
+      const cartItem = this.items.find(item => item.id === product.id);
       
-      if (existingItem) {
-        // Check if we have enough stock for the additional quantity
-        if (product.stock < existingItem.quantity + quantity) {
-          this.error = 'Not enough stock available';
-          return false;
-        }
-        
-        // Update quantity
-        existingItem.quantity += quantity;
+      if (cartItem) {
+        // Increment quantity if already in cart
+        cartItem.quantity++;
       } else {
         // Add new item to cart
         this.items.push({
@@ -59,59 +47,61 @@ export const useCartStore = defineStore('cart', {
           name: product.name,
           price: product.price,
           image: product.image,
-          quantity: quantity
+          quantity: 1
         });
       }
       
-      // Update product stock (in a real app, this would be done on the server)
-      productStore.updateProductStock(product.id, quantity);
+      // Update product stock
+      productStore.updateProductStock(product.id, 1);
+    },
+    
+    removeFromCart(productId) {
+      const productStore = useProductStore();
+      const index = this.items.findIndex(item => item.id === productId);
       
-      this.error = null;
-      return true;
+      if (index !== -1) {
+        const item = this.items[index];
+        
+        // Return stock
+        productStore.updateProductStock(productId, -item.quantity);
+        
+        // Remove from cart
+        this.items.splice(index, 1);
+      }
     },
     
     updateQuantity(productId, quantity) {
       const productStore = useProductStore();
-      const product = productStore.getProductById(productId);
       const item = this.items.find(item => item.id === productId);
       
-      if (!item) return;
-      
-      const quantityDiff = quantity - item.quantity;
-      
-      // Check if we have enough stock
-      if (quantityDiff > 0 && product.stock < quantityDiff) {
-        this.error = 'Not enough stock available';
-        return false;
-      }
-      
-      // Update quantity
-      item.quantity = quantity;
-      
-      // Update product stock (in a real app, this would be done on the server)
-      if (quantityDiff !== 0) {
-        productStore.updateProductStock(productId, quantityDiff);
-      }
-      
-      // Remove item if quantity is 0
-      if (item.quantity <= 0) {
-        this.removeFromCart(productId);
-      }
-      
-      this.error = null;
-      return true;
-    },
-    
-    removeFromCart(productId) {
-      const index = this.items.findIndex(item => item.id === productId);
-      
-      if (index !== -1) {
-        this.items.splice(index, 1);
+      if (item) {
+        const product = productStore.products.find(p => p.id === productId);
+        const change = quantity - item.quantity;
+        
+        // Check if we have enough stock
+        if (change > 0 && product.stock < change) {
+          throw new Error('Not enough stock available');
+        }
+        
+        // Update stock
+        productStore.updateProductStock(productId, change);
+        
+        // Update quantity
+        item.quantity = quantity;
+        
+        // Remove if quantity is 0
+        if (item.quantity <= 0) {
+          this.removeFromCart(productId);
+        }
       }
     },
     
     clearCart() {
       this.items = [];
+    },
+    
+    setCheckoutStatus(status) {
+      this.checkoutStatus = status;
     }
   }
 });
