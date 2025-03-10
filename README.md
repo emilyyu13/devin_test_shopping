@@ -1,33 +1,50 @@
 # E-Commerce Order System
 
-A full-stack e-commerce order system with Nuxt 3 frontend and Rails backend.
+A full-stack e-commerce order system with Nuxt 3 frontend and Rails backend, featuring stock management, payment processing, and logistics tracking.
 
 ## Features
 
-- **Stock Management**: Inventory tracking, stock updates, low stock alerts
-- **Payment Processing**: Multiple payment methods, transaction history
-- **Logistics**: Order tracking, shipping status updates, delivery management
+### Stock Management
+- Real-time inventory tracking
+- Low stock alerts (visual indicators for products with 5 or fewer items)
+- Out of stock indicators and purchase prevention
+- Stock level updates when items are added to cart
 
-## Tech Stack
+### Payment Processing
+- Multiple payment methods (Credit Card, PayPal)
+- Secure payment form with validation
+- Transaction history and payment status tracking
+- Payment confirmation
 
-### Frontend
-- Nuxt 3
-- Tailwind CSS
-- Pinia for state management
+### Logistics
+- Order tracking with shipment status timeline
+- Shipping status updates (Processing, Shipped, Out for Delivery, Delivered)
+- Estimated delivery dates
+- Tracking number and carrier information
 
-### Backend
-- Ruby on Rails API
-- PostgreSQL database
-- JWT authentication
+## Frontend (Nuxt 3)
 
-## Project Structure
+The frontend is built with Nuxt 3 and includes:
 
-- `/frontend` - Nuxt 3 application
-- `/backend` - Rails API application
+- Product listing page with stock indicators
+- Interactive shopping cart with localStorage persistence
+- Checkout page with customer information and payment forms
+- Order confirmation page with tracking information
+- Order history page
+
+## Backend (Mock API)
+
+The backend is implemented as a mock API server using Express.js with the following endpoints:
+
+- `/api/v1/products` - Get all products
+- `/api/v1/orders` - Create and list orders
+- `/api/v1/orders/:id` - Get order details
+- `/api/v1/orders/:id/order_items` - Add items to an order
+- `/api/v1/orders/:id/payments` - Process payments for an order
 
 ## Getting Started
 
-### Frontend
+### Running the Frontend
 
 ```bash
 cd frontend
@@ -35,15 +52,20 @@ npm install
 npm run dev
 ```
 
-### Backend
+### Running the Mock API Server
 
 ```bash
-cd backend
-bundle install
-rails db:create db:migrate db:seed
-rails server
+cd backend/mock-api
+npm install
+node server.js
 ```
 
-## API Documentation
+## User Journey
 
-See the backend README for detailed API documentation.
+1. Browse products on the home page
+2. Add products to cart
+3. Proceed to checkout
+4. Enter shipping and payment information
+5. Complete order
+6. View order confirmation with tracking details
+7. Check order history
