@@ -1,12 +1,15 @@
 import { defineStore } from 'pinia';
+import { useProductStore } from './products';
 
 export const useCartStore = defineStore('cart', {
   state: () => ({
-    items: []
+    items: [],
+    loading: false,
+    error: null
   }),
   
   getters: {
-    totalItems: (state) => {
+    itemCount: (state) => {
       return state.items.reduce((total, item) => total + item.quantity, 0);
     },
     
@@ -14,56 +17,96 @@ export const useCartStore = defineStore('cart', {
       return state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
     },
     
-    shipping: (state) => {
-      const subtotal = state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
-      return subtotal > 100 ? 0 : 10;
+    tax: (state) => {
+      return state.subtotal * 0.08; // 8% tax
     },
     
-    tax: (state) => {
-      const subtotal = state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
-      return subtotal * 0.08; // 8% tax
+    shipping: (state) => {
+      return state.subtotal > 100 ? 0 : 10; // Free shipping for orders over $100
     },
     
     total: (state) => {
-      const subtotal = state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
-      const shipping = subtotal > 100 ? 0 : 10;
-      const tax = subtotal * 0.08;
-      return subtotal + shipping + tax;
+      return state.subtotal + state.tax + state.shipping;
     }
   },
   
   actions: {
-    addItem(product, quantity = 1) {
+    addToCart(product, quantity = 1) {
+      const productStore = useProductStore();
+      
+      // Check if product is in stock
+      if (product.stock < quantity) {
+        this.error = 'Not enough stock available';
+        return false;
+      }
+      
+      // Check if product is already in cart
       const existingItem = this.items.find(item => item.id === product.id);
       
       if (existingItem) {
-        // Ensure we don't exceed stock
-        const newQuantity = Math.min(existingItem.quantity + quantity, product.stock);
-        existingItem.quantity = newQuantity;
+        // Check if we have enough stock for the additional quantity
+        if (product.stock < existingItem.quantity + quantity) {
+          this.error = 'Not enough stock available';
+          return false;
+        }
+        
+        // Update quantity
+        existingItem.quantity += quantity;
       } else {
+        // Add new item to cart
         this.items.push({
           id: product.id,
           name: product.name,
-          description: product.description,
           price: product.price,
           image: product.image,
-          quantity: Math.min(quantity, product.stock),
-          stock: product.stock
+          quantity: quantity
         });
       }
-    },
-    
-    removeItem(productId) {
-      const index = this.items.findIndex(item => item.id === productId);
-      if (index !== -1) {
-        this.items.splice(index, 1);
-      }
+      
+      // Update product stock (in a real app, this would be done on the server)
+      productStore.updateProductStock(product.id, quantity);
+      
+      this.error = null;
+      return true;
     },
     
     updateQuantity(productId, quantity) {
+      const productStore = useProductStore();
+      const product = productStore.getProductById(productId);
       const item = this.items.find(item => item.id === productId);
-      if (item) {
-        item.quantity = Math.min(Math.max(1, quantity), item.stock);
+      
+      if (!item) return;
+      
+      const quantityDiff = quantity - item.quantity;
+      
+      // Check if we have enough stock
+      if (quantityDiff > 0 && product.stock < quantityDiff) {
+        this.error = 'Not enough stock available';
+        return false;
+      }
+      
+      // Update quantity
+      item.quantity = quantity;
+      
+      // Update product stock (in a real app, this would be done on the server)
+      if (quantityDiff !== 0) {
+        productStore.updateProductStock(productId, quantityDiff);
+      }
+      
+      // Remove item if quantity is 0
+      if (item.quantity <= 0) {
+        this.removeFromCart(productId);
+      }
+      
+      this.error = null;
+      return true;
+    },
+    
+    removeFromCart(productId) {
+      const index = this.items.findIndex(item => item.id === productId);
+      
+      if (index !== -1) {
+        this.items.splice(index, 1);
       }
     },
     
