@@ -1,6 +1,7 @@
-export const API_URL = 'http://localhost:3000/api/v1';
+const API_URL = 'http://localhost:3001/api/v1';
 
-export const fetchProducts = async () => {
+// Fetch products from the API
+async function fetchProducts() {
   try {
     const response = await fetch(`${API_URL}/products`);
     if (!response.ok) {
@@ -9,11 +10,12 @@ export const fetchProducts = async () => {
     return await response.json();
   } catch (error) {
     console.error('Error fetching products:', error);
-    throw error;
+    return [];
   }
-};
+}
 
-export const createOrder = async (orderData) => {
+// Create a new order
+async function createOrder(orderData) {
   try {
     const response = await fetch(`${API_URL}/orders`, {
       method: 'POST',
@@ -32,9 +34,10 @@ export const createOrder = async (orderData) => {
     console.error('Error creating order:', error);
     throw error;
   }
-};
+}
 
-export const addOrderItem = async (orderId, orderItemData) => {
+// Add an item to an order
+async function addOrderItem(orderId, orderItemData) {
   try {
     const response = await fetch(`${API_URL}/orders/${orderId}/order_items`, {
       method: 'POST',
@@ -53,9 +56,10 @@ export const addOrderItem = async (orderId, orderItemData) => {
     console.error('Error adding order item:', error);
     throw error;
   }
-};
+}
 
-export const createPayment = async (orderId, paymentData) => {
+// Process payment for an order
+async function createPayment(orderId, paymentData) {
   try {
     const response = await fetch(`${API_URL}/orders/${orderId}/payments`, {
       method: 'POST',
@@ -74,9 +78,10 @@ export const createPayment = async (orderId, paymentData) => {
     console.error('Error creating payment:', error);
     throw error;
   }
-};
+}
 
-export const getOrder = async (orderId) => {
+// Get order details
+async function getOrder(orderId) {
   try {
     const response = await fetch(`${API_URL}/orders/${orderId}`);
     
@@ -89,4 +94,4 @@ export const getOrder = async (orderId) => {
     console.error('Error fetching order:', error);
     throw error;
   }
-};
+}
